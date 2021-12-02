@@ -1,13 +1,46 @@
 import motor.motor_asyncio
 from bson.objectid import ObjectId
 from decouple import config
+from outfit import Outfit, Logger, ConsulCon, VaultCon, merge_dict
 
-MONGO_DETAILS = config('MONGO_DETAILS') # read environment variable.
 
-client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_DETAILS)
+__confit_info__ = 'configs/config.yaml'
 
-database = client.students
+# load config via python-outfit
+Outfit.setup(__confit_info__)
 
+vault = VaultCon().get_secret_kv()
+
+consul = ConsulCon().get_kv()
+
+# merge dict from vault and consul
+config_set = merge_dict(consul, vault)
+
+
+
+# MONGO_DETAILS = config('MONGO_DETAILS') 
+# read environment variable.
+uri = "mongodb://%s:%s@%s:%d/%s" % (
+    config_set['mongodb']['username'], 
+    config_set['mongodb']['password'], 
+    config_set['mongodb']['host'], config_set['mongodb']['port'],
+    config_set['mongodb']['database'])
+
+Logger.info(uri)
+print(uri)
+client = motor.motor_asyncio.AsyncIOMotorClient(uri)
+'''
+client = motor.motor_asyncio.AsyncIOMotorClient(
+            config_set['mongodb']['host'], 
+            config_set['mongodb']['port'], 
+            username = config_set['mongodb']['username'], 
+            password = config_set['mongodb']['password'], 
+            authSource = config_set['mongodb']['database'], 
+        )
+'''
+
+database = client[config_set['mongodb']['database']]
+print(config_set['mongodb']['database'])
 student_collection = database.get_collection("students_collection")
 
 

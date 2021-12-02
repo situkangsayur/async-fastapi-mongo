@@ -1,0 +1,18 @@
+vault:
+    host: ${VAULT_HOST}
+    port: ${VAULT_PORT}
+    scheme: ${VAULT_SCHEME} 
+    token: ${VAULT_TOKEN}
+    path: ${VAULT_PATH}
+consul:
+    host: ${CONSUL_HOST}
+    port: ${CONSUL_PORT}
+    scheme: ${CONSUL_SCHEME}
+    token: ${CONSUL_TOKEN}
+    path: ${CONSUL_PATH}
+logconfig:
+    mode: ${LOG_MODE}
+    source_type: ${LOG_TYPE}
+    source_location: ${LOG_LOCATION}
+    default_type: yaml_file
+    default_location: configs/logging.yaml
